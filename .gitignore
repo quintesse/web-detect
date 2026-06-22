@@ -1,0 +1,33 @@
+# Environment variables (secrets, API keys, etc.)
+.env
+.env.local
+.env.*.local
+
+# Cache and temporary files
+cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker volumes and artifacts
+web-detect_cache/
+
+# OS-specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db

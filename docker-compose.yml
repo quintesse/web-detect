@@ -1,0 +1,60 @@
+services:
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # urlwatch – web change monitor
+  #
+  # Kept running with `tail -f /dev/null` so Ofelia can exec into it.
+  # All actual checks are triggered by the ofelia service below.
+  # ──────────────────────────────────────────────────────────────────────────
+  urlwatch:
+    build: .
+    container_name: web-detect-urlwatch
+    restart: unless-stopped
+    command: ["tail", "-f", "/dev/null"]
+    volumes:
+      - ./config:/config:ro
+      - ./scripts:/scripts:ro
+      - cache:/cache
+    environment:
+      # Space-separated list of Apprise notification URLs.
+      # Set the value in your .env file (see .env.example).
+      # Example: "telegram://bottoken/chatid discord://webhookid/token"
+      APPRISE_URLS: ${APPRISE_URLS}
+    labels:
+      ofelia.enabled: "true"
+
+      # ── fast tier: every 5 minutes ─────────────────────────────────────
+      ofelia.job-exec.check-fast.schedule: "@every 5m"
+      ofelia.job-exec.check-fast.no-overlap: "true"
+      ofelia.job-exec.check-fast.command: "/scripts/run-check.sh fast"
+
+      # ── hourly tier: at the top of every hour ──────────────────────────
+      ofelia.job-exec.check-hourly.schedule: "0 * * * *"
+      ofelia.job-exec.check-hourly.no-overlap: "true"
+      ofelia.job-exec.check-hourly.command: "/scripts/run-check.sh hourly"
+
+      # ── daily tier: every day at 07:00 ─────────────────────────────────
+      ofelia.job-exec.check-daily.schedule: "0 7 * * *"
+      ofelia.job-exec.check-daily.no-overlap: "true"
+      ofelia.job-exec.check-daily.command: "/scripts/run-check.sh daily"
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # ofelia – cron-style job scheduler for Docker
+  #
+  # Reads job definitions from the labels on the urlwatch container above
+  # and executes them on their configured schedules.
+  # ──────────────────────────────────────────────────────────────────────────
+  ofelia:
+    image: mcuadros/ofelia:latest
+    container_name: web-detect-ofelia
+    restart: unless-stopped
+    depends_on:
+      - urlwatch
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+volumes:
+  # Named volume for urlwatch SQLite cache databases (one per tier).
+  # Survives container restarts; avoids treating every first run as "new".
+  cache:

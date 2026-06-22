@@ -1,0 +1,31 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# urls-fast.yaml  –  FAST tier (checked every 5 minutes)
+#
+# Use this file for pages or API endpoints that change frequently and where
+# you need near-real-time alerts (e.g. live prices, stock levels, status pages).
+#
+# Each job starts with `---` and must carry `tags: [fast]`.
+# See urlwatch docs for all available filters:
+#   https://urlwatch.readthedocs.io/en/latest/filters.html
+# ──────────────────────────────────────────────────────────────────────────────
+
+---
+# Example: Monitor a JSON API endpoint for a status field
+name: "Example – API status check"
+url: "https://api.example.com/status"
+tags: [fast]
+enabled: false
+filter:
+  - jq: '.status'
+  - strip
+
+---
+# Example: Watch a specific element on a product page (e.g. availability badge)
+name: "Example – Product availability"
+url: "https://shop.example.com/product/1234"
+tags: [fast]
+enabled: false
+filter:
+  - css: "span.availability"
+  - html2text
+  - strip

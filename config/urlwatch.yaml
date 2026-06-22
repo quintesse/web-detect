@@ -1,0 +1,32 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# urlwatch global configuration
+# Shared by all three schedule tiers (fast / hourly / daily).
+# ──────────────────────────────────────────────────────────────────────────────
+
+display:
+  # Report new pages (first time a URL is seen)
+  new: true
+  # Report fetch/parse errors
+  error: true
+  # Do NOT report when nothing has changed – keeps notification volume low
+  unchanged: false
+
+report:
+  # Write the diff to stdout so run-check.sh can capture it and forward
+  # to Apprise when non-empty.
+  stdout:
+    enabled: true
+    color: false   # No ANSI codes; Apprise messages are plain text
+
+  # All other reporters disabled; notifications are handled by run-check.sh
+  email:
+    enabled: false
+
+job_defaults:
+  url:
+    # Seconds before a request is considered timed out
+    timeout: 30
+    # Retry a failing job up to this many times before reporting the error
+    max_tries: 3
+    # Treat HTTP 429 / 503 as transient; do not alert on first occurrence
+    ignore_http_error_codes: [429, 503]

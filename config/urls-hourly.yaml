@@ -1,0 +1,44 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# urls-hourly.yaml  –  HOURLY tier (checked once per hour)
+#
+# Use this file for pages that update regularly throughout the day but where
+# a 1-hour detection lag is acceptable (e.g. news sections, dashboards,
+# release pages, blog indexes).
+#
+# Each job starts with `---` and must carry `tags: [hourly]`.
+# ──────────────────────────────────────────────────────────────────────────────
+
+---
+# Example: Watch the latest GitHub release tag for a project
+name: "Example – GitHub latest release"
+url: "https://github.com/example/project/releases"
+tags: [hourly]
+enabled: false
+filter:
+  - xpath:
+      path: '//*[contains(@class,"Link--primary")]'
+      maxitems: 1
+  - html2text
+  - strip
+
+---
+# Example: Monitor a news section on a website (text only, no ads/nav)
+name: "Example – News section headlines"
+url: "https://news.example.com/"
+tags: [hourly]
+enabled: false
+filter:
+  - css: "section.latest-news h2"
+  - html2text
+  - strip
+  - sort
+
+---
+# Example: Watch a plain-text changelog or version file
+name: "Example – Project changelog"
+url: "https://example.com/CHANGELOG.txt"
+tags: [hourly]
+enabled: false
+filter:
+  - grep: "^## "
+  - strip

@@ -1,0 +1,44 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# urls-daily.yaml  –  DAILY tier (checked once per day at 07:00)
+#
+# Use this file for pages that change infrequently or where a same-day
+# notification is sufficient (e.g. weekly reports, policy pages, job boards,
+# documentation).
+#
+# Each job starts with `---` and must carry `tags: [daily]`.
+# ──────────────────────────────────────────────────────────────────────────────
+
+---
+# Example: Monitor a terms-of-service or privacy policy page for text changes
+name: "Example – Terms of Service"
+url: "https://example.com/legal/tos"
+tags: [daily]
+enabled: false
+filter:
+  - css: "article.legal-content"
+  - html2text
+  - strip
+
+---
+# Example: Watch a job board section for new postings
+name: "Example – Job listings"
+url: "https://careers.example.com/openings"
+tags: [daily]
+enabled: false
+filter:
+  - css: "ul.job-list li"
+  - html2text
+  - strip
+  - sort
+
+---
+# Example: Track an RSS/Atom feed (extract item titles and dates)
+name: "Example – Blog RSS feed"
+url: "https://blog.example.com/feed.xml"
+tags: [daily]
+enabled: false
+filter:
+  - xpath:
+      path: "//item/title/text()|//item/pubDate/text()"
+      method: xml
+  - sort
